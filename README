@@ -14,7 +14,8 @@ running in parallel using the optional script argument, and timing how long each
 time ./test.php 1
 time ./test.php 20
 
-The first only allows one request to run at once, serializing the calls. I see this taking around 100 seconds. The second run has 20 in flight at a time, and takes 11 seconds! Be warned though,
+The first only allows one request to run at once, serializing the calls. I see this taking around
+100 seconds. The second run has 20 in flight at a time, and takes 11 seconds! Be warned though,
 it's possible to overwhelm your target if you fire too many requests at once. You may end up
 with your IP banned from accessing that server, or hit other API limits.
 
