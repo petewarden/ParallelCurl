@@ -137,7 +137,7 @@ class ParallelCurl {
     // Blocks until there's less than the specified number of requests outstanding
     private function waitForOutstandingRequestsToDropBelow($max)
     {
-        while (count($this->outstanding_requests)>$max)
+        while (count($this->outstanding_requests)>=$max)
         {
             $this->checkForCompletedRequests();
             sleep(1);
