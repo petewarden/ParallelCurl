@@ -112,7 +112,8 @@ foreach ($terms_list as $terms) {
     $parallel_curl->startRequest($search_url, 'on_request_done', $search);
 }
 
-// You must call this at the end of the 
+// This should be called when you need to wait for the requests to finish.
+// This will automatically run on destruct of the ParallelCurl object, so the next line is optional.
 $parallel_curl->finishAllRequests();
 
 ?>
