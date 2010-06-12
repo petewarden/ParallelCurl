@@ -142,7 +142,7 @@ class ParallelCurl {
             if (count($this->outstanding_requests)<$max)
             	break;
             
-            usleep(100);
+            usleep(10000);
         }
     }
 
