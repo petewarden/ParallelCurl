@@ -70,7 +70,7 @@ class ParallelCurl {
     // Start a fetch from the $url address, calling the $callback function passing the optional
     // $user_data value. The callback should accept 3 arguments, the url, curl handle and user
     // data, eg on_request_done($url, $ch, $user_data);
-    public function startRequest($url, $callback, $user_data = array()) {
+    public function startRequest($url, $callback, $user_data = array(), $post_fields=null) {
 
         $this->waitForOutstandingRequestsToDropBelow($this->max_requests);
     
@@ -78,6 +78,11 @@ class ParallelCurl {
         curl_setopt_array($ch, $this->options);
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+
+        if (isset($post_fields)) {
+            curl_setopt($request, CURLOPT_POST, TRUE);
+            curl_setopt($request, CURLOPT_POSTFIELDS, $post_fields);
+        }
         
         curl_multi_add_handle($this->multi_handle, $ch);
         
