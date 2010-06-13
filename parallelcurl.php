@@ -24,18 +24,12 @@
 // This startRequest call will return immediately, as long as less than the maximum number of
 // requests are outstanding. Once the request is done, the callback function will be called, eg:
 //
-// on_request_done($content, 'http://example.com', $ch, array('something));
+// on_request_done($content, 'http://example.com', $ch, array('something'));
 //
 // The callback should take four arguments. The first is a string containing the content found at
 // the URL. The second is the original URL requested, the third is the curl handle of the request that
 // can be queried to get the results, and the fourth is the arbitrary 'cookie' value that you 
 // associated with this object. This cookie contains user-defined data.
-//
-// Since you may have requests outstanding at the end of your script, you *MUST* call
-//
-// $parallelcurl->finishAllRequests();
-//
-// before you exit. If you don't, the final requests may be left unprocessed!
 //
 // By Pete Warden <pete@petewarden.com>, freely reusable, see http://petewarden.typepad.com for more
 
@@ -53,6 +47,11 @@ class ParallelCurl {
         
         $this->outstanding_requests = array();
         $this->multi_handle = curl_multi_init();
+    }
+    
+    //Ensure all the requests finish nicely
+    public function __destruct() {
+    	$this->finishAllRequests();
     }
 
     // Sets how many requests can be outstanding at once before we block and wait for one to
@@ -72,7 +71,8 @@ class ParallelCurl {
     // data, eg on_request_done($url, $ch, $user_data);
     public function startRequest($url, $callback, $user_data = array(), $post_fields=null) {
 
-        $this->waitForOutstandingRequestsToDropBelow($this->max_requests);
+		if( $this->max_requests > 0 )
+	        $this->waitForOutstandingRequestsToDropBelow($this->max_requests);
     
         $ch = curl_init();
         curl_setopt_array($ch, $this->options);
@@ -130,7 +130,7 @@ class ParallelCurl {
             $callback = $request['callback'];
             $user_data = $request['user_data'];
             
-            $callback($content, $url, $ch, $user_data);
+            call_user_func($callback, $content, $url, $ch, $user_data);
             
             unset($this->outstanding_requests[$ch]);
             
@@ -142,10 +142,12 @@ class ParallelCurl {
     // Blocks until there's less than the specified number of requests outstanding
     private function waitForOutstandingRequestsToDropBelow($max)
     {
-        while (count($this->outstanding_requests)>=$max)
-        {
+        while (1) {
             $this->checkForCompletedRequests();
-            sleep(1);
+            if (count($this->outstanding_requests)<$max)
+            	break;
+            
+            usleep(10000);
         }
     }
 
