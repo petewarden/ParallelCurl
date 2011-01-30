@@ -80,8 +80,8 @@ class ParallelCurl {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 
         if (isset($post_fields)) {
-            curl_setopt($request, CURLOPT_POST, TRUE);
-            curl_setopt($request, CURLOPT_POSTFIELDS, $post_fields);
+            curl_setopt($ch, CURLOPT_POST, TRUE);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
         }
         
         curl_multi_add_handle($this->multi_handle, $ch);
