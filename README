@@ -50,6 +50,10 @@ the URL. The second is the original URL requested, the third is the curl handle 
 can be queried to get the results, and the fourth is the arbitrary 'cookie' value that you 
 associated with this object. This cookie contains user-defined data.
 
+There's an optional fourth parameter to startRequest. If you pass in an array at that position in
+the arguments, the POST method will be used instead, with the contents of the array controlling the
+contents of the POST parameters.
+
 Since you may have requests outstanding at the end of your script, you *MUST* call
 
 $parallelcurl->finishAllRequests();
