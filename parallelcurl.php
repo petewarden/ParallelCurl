@@ -57,13 +57,13 @@ class ParallelCurl {
     // Sets how many requests can be outstanding at once before we block and wait for one to
     // finish before starting the next one
     public function setMaxRequests($in_max_requests) {
-        $max_requests = $in_max_requests;
+        $this->max_requests = $in_max_requests;
     }
     
     // Sets the options to pass to curl, using the format of curl_setopt_array()
     public function setOptions($in_options) {
 
-        $options = $in_options;
+        $this->options = $in_options;
     }
 
     // Start a fetch from the $url address, calling the $callback function passing the optional
