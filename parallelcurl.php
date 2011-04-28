@@ -86,7 +86,9 @@ class ParallelCurl {
         
         curl_multi_add_handle($this->multi_handle, $ch);
         
-        $this->outstanding_requests[$ch] = array(
+        $ch_array_key = (int)$ch;
+
+        $this->outstanding_requests[$ch_array_key] = array(
             'url' => $url,
             'callback' => $callback,
             'user_data' => $user_data,
@@ -117,13 +119,14 @@ class ParallelCurl {
         while ($info = curl_multi_info_read($this->multi_handle)) {
         
             $ch = $info['handle'];
+            $ch_array_key = (int)$ch;
             
-            if (!isset($this->outstanding_requests[$ch])) {
+            if (!isset($this->outstanding_requests[$ch_array_key])) {
                 die("Error - handle wasn't found in requests: '$ch' in ".
                     print_r($this->outstanding_requests, true));
             }
             
-            $request = $this->outstanding_requests[$ch];
+            $request = $this->outstanding_requests[$ch_array_key];
 
             $url = $request['url'];
             $content = curl_multi_getcontent($ch);
@@ -132,7 +135,7 @@ class ParallelCurl {
             
             call_user_func($callback, $content, $url, $ch, $user_data);
             
-            unset($this->outstanding_requests[$ch]);
+            unset($this->outstanding_requests[$ch_array_key]);
             
             curl_multi_remove_handle($this->multi_handle, $ch);
         }
