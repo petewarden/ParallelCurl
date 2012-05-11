@@ -75,9 +75,9 @@ class ParallelCurl {
 	        $this->waitForOutstandingRequestsToDropBelow($this->max_requests);
     
         $ch = curl_init();
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
         curl_setopt_array($ch, $this->options);
         curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 
         if (isset($post_fields)) {
             curl_setopt($ch, CURLOPT_POST, TRUE);
