@@ -48,7 +48,7 @@
 
     $parallel_curl->finishAllRequests();
 
-# In detail
+## In detail
 
 This module provides an easy-to-use interface to allow you to run multiple CURL url fetches in parallel in PHP. 
 
