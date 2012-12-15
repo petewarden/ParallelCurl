@@ -1,6 +1,22 @@
 # ParallelCurl
 
-## Usage
+## Simple usage
+
+    require 'parallelcurl.php';
+
+    $parallel_curl = new ParallelCurl($max_parallel_requests, $curl_options);
+
+    $urls = array("http://github.com/", "http://news.ycombinator.com/");
+    foreach ($urls as $url) {
+        $parallel_curl->startRequest($url, function($content, $url, $ch, $param) {
+            print $content;
+        });
+    }
+
+    $parallel_curl->finishAllRequests();
+
+
+## Advanced usage
 
     require 'parallelcurl.php';
 
@@ -38,14 +54,14 @@ This module provides an easy-to-use interface to allow you to run multiple CURL 
 
 To test it, go to the command line, cd to this folder and run
 
-./test.php
+    ./test.php
 
 This should run 100 searches through Google's API, printing the results. To see what sort of
 performance difference running parallel requests gets you, try altering the default of 10 requests
 running in parallel using the optional script argument, and timing how long each takes:
 
-time ./test.php 1
-time ./test.php 20
+    time ./test.php 1
+    time ./test.php 20
 
 The first only allows one request to run at once, serializing the calls. I see this taking around
 100 seconds. The second run has 20 in flight at a time, and takes 11 seconds! Be warned though,
@@ -57,9 +73,9 @@ waiting for each one to finish before starting the next. Under the hood it uses 
 but since I find that interface painfully confusing, I wanted one that corresponded to the tasks
 that I wanted to run.
 
-To use it, first copy parallelcurl.php and include it, then create the ParallelCurl object:
+To use it, first copy `parallelcurl.php` and include it, then create the `ParallelCurl` object:
 
-$parallelcurl = new ParallelCurl(10);
+    $parallelcurl = new ParallelCurl(10);
 
 The first argument to the constructor is the maximum number of outstanding fetches to allow
 before blocking to wait for one to finish. You can change this later using setMaxRequests()
@@ -67,7 +83,7 @@ The second optional argument is an array of curl options in the format used by c
 
 Next, start a URL fetch:
 
-$parallelcurl->startRequest('http://example.com', 'on_request_done', array('something'));
+    $parallelcurl->startRequest('http://example.com', 'on_request_done', array('something'));
 
 The first argument is the address that should be fetched
 The second is the callback function that will be run once the request is done
@@ -89,7 +105,7 @@ contents of the POST parameters.
 
 Since you may have requests outstanding at the end of your script, you *MUST* call
 
-$parallelcurl->finishAllRequests();
+    $parallelcurl->finishAllRequests();
 
 before you exit. If you don't, the final requests may be left unprocessed!
 
