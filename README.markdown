@@ -8,7 +8,7 @@
 
     $urls = array("http://github.com/", "http://news.ycombinator.com/");
     foreach ($urls as $url) {
-        $parallel_curl->startRequest($url, function($content, $url, $ch, $param) {
+        $parallel_curl->startRequest($url, function($content, $url, $ch) {
             print $content;
         });
     }
