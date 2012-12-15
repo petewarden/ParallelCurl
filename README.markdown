@@ -1,5 +1,38 @@
-ParallelCurl
-~~~~~~~~~~~~~~~
+# ParallelCurl
+
+## Usage
+
+    require 'parallelcurl.php';
+
+    function on_request_done($content, $url, $ch, $param) {
+    {
+        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);    
+        if ($httpcode !== 200) {
+            print "Fetch error $httpcode for '$url'\n";
+            return;
+        }
+        print $content;
+    }
+
+    $curl_options = array(
+        CURLOPT_SSL_VERIFYPEER => FALSE,
+        CURLOPT_SSL_VERIFYHOST => FALSE,
+        CURLOPT_USERAGENT, 'Parallel Curl test script',
+    );
+
+    $max_parallel_requests = 10;
+    $parallel_curl = new ParallelCurl($max_parallel_requests, $curl_options);
+
+    $urls = array("http://github.com/", "http://news.ycombinator.com/");
+
+    foreach ($urls as $url) {
+        $param = 'Arbitrary parameter';
+        $parallel_curl->startRequest($url, 'on_request_done', $param);
+    }
+
+    $parallel_curl->finishAllRequests();
+
+# In detail
 
 This module provides an easy-to-use interface to allow you to run multiple CURL url fetches in parallel in PHP. 
 
