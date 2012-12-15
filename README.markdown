@@ -42,7 +42,7 @@
     $urls = array("http://github.com/", "http://news.ycombinator.com/");
 
     foreach ($urls as $url) {
-        $param = 'Arbitrary parameter';
+        $param = 'Arbitrary parameter to callback: ' . $url;
         $parallel_curl->startRequest($url, 'on_request_done', $param);
     }
 
@@ -78,8 +78,8 @@ To use it, first copy `parallelcurl.php` and include it, then create the `Parall
     $parallelcurl = new ParallelCurl(10);
 
 The first argument to the constructor is the maximum number of outstanding fetches to allow
-before blocking to wait for one to finish. You can change this later using setMaxRequests()
-The second optional argument is an array of curl options in the format used by curl_setopt_array()
+before blocking to wait for one to finish. You can change this later using `setMaxRequests()`
+The second optional argument is an array of curl options in the format used by `curl_setopt_array()`
 
 Next, start a URL fetch:
 
@@ -89,10 +89,10 @@ The first argument is the address that should be fetched
 The second is the callback function that will be run once the request is done
 The third is a 'cookie', that can contain arbitrary data to be passed to the callback
 
-This startRequest call will return immediately, as long as less than the maximum number of
+This `startRequest` call will return immediately, as long as less than the maximum number of
 requests are outstanding. Once the request is done, the callback function will be called, eg:
 
-on_request_done($content, 'http://example.com', $ch, array('something));
+    on_request_done($content, 'http://example.com', $ch, array('something));
 
 The callback should take four arguments. The first is a string containing the content found at
 the URL. The second is the original URL requested, the third is the curl handle of the request that
@@ -109,4 +109,4 @@ Since you may have requests outstanding at the end of your script, you *MUST* ca
 
 before you exit. If you don't, the final requests may be left unprocessed!
 
-By Pete Warden <pete@petewarden.com>, freely reusable, see http://petewarden.typepad.com for more
+By Pete Warden <pete@petewarden.com>, freely reusable, see [http://petewarden.typepad.com](http://petewarden.typepad.com) for more
