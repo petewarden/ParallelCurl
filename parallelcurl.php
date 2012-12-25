@@ -41,17 +41,26 @@ class ParallelCurl {
     public $outstanding_requests;
     public $multi_handle;
     
+    private $curl_handlers_pool;
+    private $lockfile;
+    
     public function __construct($in_max_requests = 10, $in_options = array()) {
         $this->max_requests = $in_max_requests;
         $this->options = $in_options;
         
         $this->outstanding_requests = array();
         $this->multi_handle = curl_multi_init();
+        $this->curl_handlers_pool = array();
+        $this->lockfile = tmpfile();
     }
     
     //Ensure all the requests finish nicely
     public function __destruct() {
     	$this->finishAllRequests();
+      // close all curl handlers in pool
+      while ($ch = $this->reuse_curl_handler(TRUE))
+        curl_close($ch);
+      fclose($this->lockfile);  
     }
 
     // Sets how many requests can be outstanding at once before we block and wait for one to
@@ -74,14 +83,18 @@ class ParallelCurl {
 		if( $this->max_requests > 0 )
 	        $this->waitForOutstandingRequestsToDropBelow($this->max_requests);
     
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt_array($ch, $this->options);
+        // reuse a handler from the pool (or get a fresh one)
+        $ch = $this->reuse_curl_handler();
+        
         curl_setopt($ch, CURLOPT_URL, $url);
 
         if (isset($post_fields)) {
             curl_setopt($ch, CURLOPT_POST, TRUE);
             curl_setopt($ch, CURLOPT_POSTFIELDS, $post_fields);
+        }
+        else {
+            curl_setopt($ch, CURLOPT_POST, FALSE);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, null);
         }
         
         curl_multi_add_handle($this->multi_handle, $ch);
@@ -134,10 +147,13 @@ class ParallelCurl {
             $user_data = $request['user_data'];
             
             unset($this->outstanding_requests[$ch_array_key]);
+            curl_multi_remove_handle($this->multi_handle, $ch);
+            
+            // push the handler to the pool so that it can be resued by another request
+            $this->push_curl_handler($ch);
 
             call_user_func($callback, $content, $url, $ch, $user_data);
                         
-            curl_multi_remove_handle($this->multi_handle, $ch);
         }
     
     }
@@ -152,6 +168,30 @@ class ParallelCurl {
             
             usleep(10000);
         }
+    }
+    
+    // curl_handlers_pool synchronized accessors:
+    // synchronization through flock is necessary because several callbacks 
+    // may eventually access the pool simultaneously while PHP is not thread-safe
+     
+    private function reuse_curl_handler($no_create = FALSE)
+    {
+      flock($this->lockfile, LOCK_EX);      
+      $ch = array_shift($this->curl_handlers_pool);
+      flock($this->lockfile, LOCK_UN);
+      if (!$ch && !$no_create) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt_array($ch, $this->options);
+      }
+      return $ch;
+    }
+    
+    private function push_curl_handler($ch)
+    {
+      flock($this->lockfile, LOCK_EX);      
+      $this->curl_handlers_pool[] = $ch;
+      flock($this->lockfile, LOCK_UN);
     }
 
 }
