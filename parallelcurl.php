@@ -105,7 +105,7 @@ class ParallelCurl {
 
     // Checks to see if any of the outstanding requests have finished
     private function checkForCompletedRequests() {
-
+	/*
         // Call select to see if anything is waiting for us
         if (curl_multi_select($this->multi_handle, 0.0) === -1)
             return;
@@ -114,7 +114,22 @@ class ParallelCurl {
         do {
             $mrc = curl_multi_exec($this->multi_handle, $active);
         } while ($mrc == CURLM_CALL_MULTI_PERFORM);
-        
+        */
+        // fix for https://bugs.php.net/bug.php?id=63411
+	do {
+		$mrc = curl_multi_exec($this->multi_handle, $active);
+	} while ($mrc == CURLM_CALL_MULTI_PERFORM);
+
+	while ($active && $mrc == CURLM_OK) {
+		if (curl_multi_select($this->multi_handle) != -1) {
+			do {
+				$mrc = curl_multi_exec($this->multi_handle, $active);
+			} while ($mrc == CURLM_CALL_MULTI_PERFORM);
+		}
+		else
+			return;
+	}
+		
         // Now grab the information about the completed requests
         while ($info = curl_multi_info_read($this->multi_handle)) {
         
