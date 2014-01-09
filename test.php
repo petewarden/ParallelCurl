@@ -1,8 +1,8 @@
 #!/usr/bin/php
 <?php
-// 
+//
 // A test script for the ParallelCurl class
-// 
+//
 // This example fetches a 100 different results from Google's search API, with no more
 // than 10 outstanding at any time.
 //
@@ -14,8 +14,8 @@ define ('SEARCH_URL_PREFIX', 'http://ajax.googleapis.com/ajax/services/search/we
 
 // This function gets called back for each request that completes
 function on_request_done($content, $url, $ch, $search) {
-    
-    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);    
+
+    $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     if ($httpcode !== 200) {
         print "Fetch error $httpcode for '$url'\n";
         return;
