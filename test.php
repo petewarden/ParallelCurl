@@ -101,7 +101,7 @@ if (isset($argv[1])) {
 $curl_options = array(
     CURLOPT_SSL_VERIFYPEER => FALSE,
     CURLOPT_SSL_VERIFYHOST => FALSE,
-    CURLOPT_USERAGENT, 'Parallel Curl test script',
+    CURLOPT_USERAGENT => 'Parallel Curl test script',
 );
 
 $parallel_curl = new ParallelCurl($max_requests, $curl_options);
