@@ -3,6 +3,13 @@ ParallelCurl
 
 This module provides an easy-to-use interface to allow you to run multiple CURL url fetches in parallel in PHP. 
 
+/I've had reports of problems that appear to be related to changes in curl_multi's behavior./
+/I'm no longer using PHP so I can't verify what's going wrong, but @marcushat has provided a port:/
+/https://github.com/marcushat/rollingcurlx /
+/If you are hitting issues, please give it a try!/
+/ Pete Warden - Dec 16th 2014 /
+
+
 To test it, go to the command line, cd to this folder and run
 
 ./test.php
