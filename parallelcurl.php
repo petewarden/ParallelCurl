@@ -121,7 +121,8 @@ class ParallelCurl {
 	} while ($mrc == CURLM_CALL_MULTI_PERFORM);
 
 	while ($active && $mrc == CURLM_OK) {
-		if (curl_multi_select($this->multi_handle) != -1) {
+		//just check if there is anything new, dont wait 
+		if (curl_multi_select($this->multi_handle, 0.01) >0) {
 			do {
 				$mrc = curl_multi_exec($this->multi_handle, $active);
 			} while ($mrc == CURLM_CALL_MULTI_PERFORM);
@@ -165,7 +166,7 @@ class ParallelCurl {
             if (count($this->outstanding_requests)<$max)
             	break;
             
-            usleep(10000);
+            curl_multi_select($this->multi_handle);
         }
     }
 
