@@ -148,9 +148,9 @@ class ParallelCurl {
             $callback = $request['callback'];
             $user_data = $request['user_data'];
             
-            call_user_func($callback, $content, $url, $ch, $user_data);
-            
             unset($this->outstanding_requests[$ch_array_key]);
+            
+            call_user_func($callback, $content, $url, $ch, $user_data);
             
             curl_multi_remove_handle($this->multi_handle, $ch);
         }
